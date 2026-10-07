@@ -4,7 +4,7 @@ Imported from the supplied StreamFlix ZIP.
 
 ## Guest mode
 
-Visitors can browse the included movie catalog and watch trailers without an account or database. The Sign in page remains visible and explains that accounts are unavailable until a PostgreSQL database and an email, GitHub, or Google sign-in provider are configured. Watchlists require an account.
+Visitors can browse the included movie catalog, search titles, open YouTube trailers in a new tab, and save a local My List without an account or database. My List is stored in that browser on that device. The Sign in page remains visible and explains that accounts are unavailable until a PostgreSQL database and an email, GitHub, or Google sign-in provider are configured.
 
 ## Overview
 

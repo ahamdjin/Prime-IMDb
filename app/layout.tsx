@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import "./stream.css";
 import { NextAuthProvider } from "./components/NextAuthProvider";
+import { hasAuth } from "./utlis/runtime";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -14,9 +16,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "StreamFlix | Watch Movies & TV Shows",
+  title: "Prime IMDb | Movies & TV Shows",
   description:
-    "StreamFlix is the ultimate streaming platform for movies, TV shows, and exclusive originals. Watch anywhere, anytime on your favorite devices.",
+    "Browse movies and TV shows and watch trailers on Prime IMDb.",
 };
 
 export default function RootLayout({
@@ -27,7 +29,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
       <body className="bg-black text-white">
-        <NextAuthProvider>{children}</NextAuthProvider>
+        {hasAuth ? <NextAuthProvider>{children}</NextAuthProvider> : children}
       </body>
     </html>
   );
