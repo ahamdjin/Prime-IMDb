@@ -172,7 +172,7 @@ export default function EmbeddedPlayer({
       ref={frameRef}
       src={playerSrc}
       title={`${title} secure player`}
-      sandbox="allow-scripts allow-forms allow-presentation"
+      sandbox="allow-scripts allow-same-origin allow-forms allow-presentation"
       allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
       referrerPolicy="no-referrer"
       allowFullScreen
