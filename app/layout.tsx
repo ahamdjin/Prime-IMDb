@@ -4,7 +4,6 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import "./stream.css";
 import { NextAuthProvider } from "./components/NextAuthProvider";
-import SecurityGuard from "./components/SecurityGuard";
 import { hasAuth } from "./utlis/runtime";
 
 const geistSans = Geist({
@@ -32,7 +31,6 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
       <body className="bg-black text-white">
-        <SecurityGuard />
         {content}
         <footer className="stream-credit stream-credit-minimal">
           <Link href="/credits">Credits</Link>
