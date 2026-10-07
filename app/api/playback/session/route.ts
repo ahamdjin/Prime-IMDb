@@ -1,6 +1,6 @@
 import { randomBytes } from "crypto";
 import { NextResponse } from "next/server";
-import { createPlaybackToken } from "@/app/utlis/playback-session";
+import { createPlaybackToken, getPlaybackClientHash } from "@/app/utlis/playback-session";
 
 export const runtime = "nodejs";
 
@@ -16,8 +16,19 @@ function sameOrigin(request: Request) {
   const url = new URL(request.url);
   const origin = request.headers.get("origin");
   const fetchSite = request.headers.get("sec-fetch-site");
+  const requestedWith = request.headers.get("x-requested-with");
+  const referer = request.headers.get("referer");
   if (origin && origin !== url.origin) return false;
   if (fetchSite && !["same-origin", "same-site", "none"].includes(fetchSite)) return false;
+  if (requestedWith !== "PrimeIMDbPlayer") return false;
+  if (referer) {
+    try {
+      const ref = new URL(referer);
+      if (ref.origin !== url.origin || !ref.pathname.startsWith("/watch/")) return false;
+    } catch {
+      return false;
+    }
+  }
   return true;
 }
 
@@ -44,6 +55,8 @@ export async function POST(request: Request) {
   const resumeAt = Math.max(0, Math.min(60 * 60 * 24, Math.floor(Number(body.resumeAt) || 0)));
 
   try {
+    const userAgent = request.headers.get("user-agent") || "";
+    const ip = (request.headers.get("x-forwarded-for") || request.headers.get("x-real-ip") || "unknown").split(",")[0].trim();
     const token = createPlaybackToken({
       imdbId,
       mediaType,
@@ -52,6 +65,7 @@ export async function POST(request: Request) {
       resumeAt,
       exp: Date.now() + 60_000,
       nonce: randomBytes(16).toString("hex"),
+      clientHash: getPlaybackClientHash(userAgent, ip),
     });
 
     return NextResponse.json(
