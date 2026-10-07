@@ -22,8 +22,7 @@ export default async function SecurePlayerPage({
 
   const requestHeaders = await headers();
   const userAgent = requestHeaders.get("user-agent") || "";
-  const ip = (requestHeaders.get("x-forwarded-for") || requestHeaders.get("x-real-ip") || "unknown").split(",")[0].trim();
-  if (getPlaybackClientHash(userAgent, ip) !== payload.clientHash) notFound();
+  if (getPlaybackClientHash(userAgent) !== payload.clientHash) notFound();
 
   const src = buildVideoEmbedUrl({
     imdbId: payload.imdbId,

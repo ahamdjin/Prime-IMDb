@@ -68,8 +68,8 @@ export function verifyPlaybackToken(token: string): PlaybackSessionPayload | nul
 }
 
 
-export function getPlaybackClientHash(userAgent: string, ip: string) {
+export function getPlaybackClientHash(userAgent: string) {
   const secret = getSecret();
   if (!secret) throw new Error("Playback session secret is not configured");
-  return createHmac("sha256", secret).update(`${userAgent}|${ip}`).digest("hex");
+  return createHmac("sha256", secret).update(userAgent).digest("hex");
 }

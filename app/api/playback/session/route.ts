@@ -56,16 +56,15 @@ export async function POST(request: Request) {
 
   try {
     const userAgent = request.headers.get("user-agent") || "";
-    const ip = (request.headers.get("x-forwarded-for") || request.headers.get("x-real-ip") || "unknown").split(",")[0].trim();
     const token = createPlaybackToken({
       imdbId,
       mediaType,
       season,
       episode,
       resumeAt,
-      exp: Date.now() + 60_000,
+      exp: Date.now() + 5 * 60_000,
       nonce: randomBytes(16).toString("hex"),
-      clientHash: getPlaybackClientHash(userAgent, ip),
+      clientHash: getPlaybackClientHash(userAgent),
     });
 
     return NextResponse.json(
