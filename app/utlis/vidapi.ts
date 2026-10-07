@@ -1,6 +1,7 @@
 import type { MediaItem, MediaPage, MediaType } from "./media-types";
 
 const VIDAPI_BASE = "https://vidapi.ru";
+const AVAILABILITY_TTL_MS = 60 * 60 * 1000;
 
 type VidApiItem = {
   tmdb_id?: string;
@@ -23,14 +24,29 @@ type VidApiPage = {
   items: VidApiItem[];
 };
 
+type AvailabilityCache = {
+  expiresAt: number;
+  movies: Set<number>;
+  shows: Set<number>;
+};
+
+let availabilityCache: AvailabilityCache | null = null;
+let availabilityPromise: Promise<AvailabilityCache> | null = null;
+
 async function getText(path: string, revalidate = 86400) {
-  const res = await fetch(`${VIDAPI_BASE}${path}`, { next: { revalidate } });
+  const res = await fetch(`${VIDAPI_BASE}${path}`, {
+    next: { revalidate },
+    headers: { accept: "text/plain" },
+  });
   if (!res.ok) throw new Error(`VidAPI request failed (${res.status}) for ${path}`);
   return res.text();
 }
 
 async function getJson<T>(path: string, revalidate = 900): Promise<T> {
-  const res = await fetch(`${VIDAPI_BASE}${path}`, { next: { revalidate } });
+  const res = await fetch(`${VIDAPI_BASE}${path}`, {
+    next: { revalidate },
+    headers: { accept: "application/json" },
+  });
   if (!res.ok) throw new Error(`VidAPI request failed (${res.status}) for ${path}`);
   return res.json() as Promise<T>;
 }
@@ -76,25 +92,56 @@ export async function getVidApiLatest(type: MediaType, page = 1): Promise<MediaP
   };
 }
 
-export async function getVidApiAvailableTmdbIds(type: MediaType): Promise<Set<number>> {
-  const file = type === "movie" ? "/ids/movie_list_tmdb.txt" : "/ids/tv_list_tmdb.txt";
-  const text = await getText(file, 86400);
-  return new Set(
-    text
-      .split(/\r?\n/)
-      .map((line) => Number(line.trim()))
-      .filter((id) => Number.isFinite(id) && id > 0)
-  );
+function parseIdList(text: string) {
+  const ids = new Set<number>();
+  for (const line of text.split(/\r?\n/)) {
+    const value = Number(line.trim());
+    if (Number.isFinite(value) && value > 0) ids.add(value);
+  }
+  return ids;
+}
+
+export async function getVidApiAvailability() {
+  const now = Date.now();
+  if (availabilityCache && availabilityCache.expiresAt > now) return availabilityCache;
+  if (availabilityPromise) return availabilityPromise;
+
+  availabilityPromise = (async () => {
+    const [movieText, tvText] = await Promise.all([
+      getText("/ids/movie_list_tmdb.txt", 86400),
+      getText("/ids/tv_list_tmdb.txt", 86400),
+    ]);
+
+    const next = {
+      expiresAt: Date.now() + AVAILABILITY_TTL_MS,
+      movies: parseIdList(movieText),
+      shows: parseIdList(tvText),
+    };
+
+    availabilityCache = next;
+    availabilityPromise = null;
+    return next;
+  })().catch((error) => {
+    availabilityPromise = null;
+    throw error;
+  });
+
+  return availabilityPromise;
+}
+
+export function filterWithVidApiAvailability(
+  items: MediaItem[],
+  availability: { movies: Set<number>; shows: Set<number> }
+) {
+  return items.filter((item) => {
+    if (!item.tmdbId) return false;
+    return item.mediaType === "movie"
+      ? availability.movies.has(item.tmdbId)
+      : availability.shows.has(item.tmdbId);
+  });
 }
 
 export async function filterToVidApiAvailable(items: MediaItem[]) {
-  const [movies, shows] = await Promise.all([
-    getVidApiAvailableTmdbIds("movie"),
-    getVidApiAvailableTmdbIds("tv"),
-  ]);
-
-  return items.filter((item) => {
-    if (!item.tmdbId) return false;
-    return item.mediaType === "movie" ? movies.has(item.tmdbId) : shows.has(item.tmdbId);
-  });
+  const availability = await getVidApiAvailability();
+  return filterWithVidApiAvailability(items, availability);
 }
