@@ -39,6 +39,7 @@ type TmdbResult = {
   overview?: string; release_date?: string; first_air_date?: string;
   poster_path?: string | null; backdrop_path?: string | null; genre_ids?: number[];
   vote_average?: number; videos?: { results?: Array<{ site: string; type: string; key: string; official?: boolean }> };
+  external_ids?: { imdb_id?: string | null };
 };
 type TmdbList = { page: number; total_pages: number; results: TmdbResult[] };
 
@@ -66,7 +67,7 @@ function normalize(result: TmdbResult, kind?: MediaType): MediaItem | null {
     ?? trailers.find((video) => video.site === "YouTube" && video.type === "Trailer")
     ?? trailers.find((video) => video.site === "YouTube" && video.type === "Teaser");
   return {
-    key: `${mediaType}-${result.id}`, tmdbId: result.id, mediaType,
+    key: `${mediaType}-${result.id}`, tmdbId: result.id, imdbId: result.external_ids?.imdb_id || undefined, mediaType,
     title: result.title || result.name || "Untitled", overview: result.overview || "Description unavailable.",
     year: Number((result.release_date || result.first_air_date || "").slice(0, 4)) || 0,
     rating: Number(result.vote_average || 0),
@@ -182,7 +183,7 @@ export async function getMediaItem(key: string): Promise<MediaItem | null> {
   const match = /^(movie|tv)-(\d+)$/.exec(key);
   if (!match || !tmdbConfigured) return null;
   try {
-    const result = await request<TmdbResult>(`/${match[1]}/${match[2]}`, { append_to_response: "videos" }, 3600);
+    const result = await request<TmdbResult>(`/${match[1]}/${match[2]}`, { append_to_response: "videos,external_ids" }, 3600);
     return normalize(result, match[1] as MediaType);
   } catch (error) {
     console.error("TMDB title unavailable:", error);
