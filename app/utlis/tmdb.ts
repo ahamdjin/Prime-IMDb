@@ -1,5 +1,6 @@
 import { catalog } from "./catalog";
 import type { Genre, MediaItem, MediaPage, MediaType } from "./media-types";
+import { filterToVidApiAvailable, getVidApiLatest } from "./vidapi";
 
 const BASE = "https://api.themoviedb.org/3";
 export const tmdbConfigured = Boolean(process.env.TMDB_API_READ_TOKEN || process.env.TMDB_API_KEY);
@@ -90,8 +91,16 @@ export async function getHomeData() {
       ["/movie/top_rated", "movie"], ["/tv/top_rated", "tv"], ["/movie/now_playing", "movie"],
     ];
     const lists = await Promise.all(paths.map(([path]) => request<TmdbList>(path)));
-    const items = lists.map((list, index) => toItems(list.results, paths[index][1]));
-    return { source: "tmdb" as const, featured: items[0].filter((item) => item.backdrop).slice(0, 6), rows: [
+    const rawItems = lists.map((list, index) => toItems(list.results, paths[index][1]));
+    const items = await Promise.all(rawItems.map((list) => filterToVidApiAvailable(list)));
+    const [latestMovies, latestShows] = await Promise.all([
+      getVidApiLatest("movie", 1),
+      getVidApiLatest("tv", 1),
+    ]);
+    const featured = items[0].filter((item) => item.backdrop).slice(0, 6);
+    return { source: "vidapi" as const, featured: featured.length ? featured : latestMovies.items.slice(0, 6), rows: [
+      { title: "Latest Movies", items: latestMovies.items },
+      { title: "Latest TV Shows", items: latestShows.items },
       { title: "Top 10 Popular Movies", items: items[1].slice(0, 10), ranked: true },
       { title: "Trending This Week", items: items[0] },
       { title: "Popular Movies", items: items[1] },
@@ -157,7 +166,8 @@ export async function browseMedia(filters: BrowseFilters, genres: Genre[]): Prom
     }));
     const combined = results.flatMap((result) => result.items);
     if (filters.type === "all") combined.sort((a, b) => filters.sort === "newest" ? b.year - a.year : filters.sort === "top_rated" ? b.rating - a.rating : 0);
-    return { items: combined, page: filters.page, totalPages: Math.min(500, Math.max(...results.map((result) => result.totalPages), 1)), source: "tmdb" };
+    const playable = await filterToVidApiAvailable(combined);
+    return { items: playable, page: filters.page, totalPages: Math.min(500, Math.max(...results.map((result) => result.totalPages), 1)), source: "vidapi" };
   } catch (error) {
     console.error("TMDB browse unavailable:", error);
     return browseDemo(filters, genres);
@@ -170,7 +180,8 @@ export async function searchMedia(query: string, page = 1): Promise<MediaPage> {
   if (!tmdbConfigured) return { items: demoItems.filter((item) => `${item.title} ${item.overview}`.toLowerCase().includes(term.toLowerCase())), page: 1, totalPages: 1, source: "demo" };
   try {
     const list = await request<TmdbList>("/search/multi", { query: term, page, include_adult: "false" }, 300);
-    return { items: toItems(list.results), page: list.page, totalPages: Math.min(500, list.total_pages), source: "tmdb" };
+    const playable = await filterToVidApiAvailable(toItems(list.results));
+    return { items: playable, page: list.page, totalPages: Math.min(500, list.total_pages), source: "vidapi" };
   } catch (error) {
     console.error("TMDB search unavailable:", error);
     return { items: demoItems.filter((item) => item.title.toLowerCase().includes(term.toLowerCase())), page: 1, totalPages: 1, source: "demo" };
