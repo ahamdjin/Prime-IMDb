@@ -17,6 +17,7 @@ interface iAppProps {
   year: number;
   age: number;
   time: number;
+  watchlistEnabled?: boolean;
 }
 
 const MovieCard = ({
@@ -29,6 +30,7 @@ const MovieCard = ({
   year,
   age,
   time,
+  watchlistEnabled = true,
 }: iAppProps) => {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
@@ -45,7 +47,7 @@ const MovieCard = ({
       </div>
 
       {/* Heart button - top right */}
-      <div className="absolute top-3 right-3 z-10">
+      {watchlistEnabled && <div className="absolute top-3 right-3 z-10">
         {watchLists ? (
           <form action={removeFromWatchList}>
             <input type="hidden" name="watchListId" value={watchListId} />
@@ -75,7 +77,7 @@ const MovieCard = ({
             </Button>
           </form>
         )}
-      </div>
+      </div>}
 
       {/* Title - bottom left */}
       <div className="absolute bottom-3 left-3 right-3">

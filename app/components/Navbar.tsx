@@ -33,7 +33,7 @@ const links: linkProps[] = [
     href: "/home/user/mylist",
   },
 ];
-const Navbar = () => {
+const Navbar = ({ authEnabled }: { authEnabled: boolean }) => {
   const pathName = usePathname();
   return (
     <div className="w-full max-w-7xl mx-auto items-center justify-between px-5 sm:px-6 lg:px-8 flex mt-2">
@@ -70,7 +70,7 @@ const Navbar = () => {
       <div className="flex items-center gap-x-4">
         <Search className="text-white hidden lg:block" />
         <Bell className="text-white hidden lg:block" />
-        <UserNav />
+        <UserNav authEnabled={authEnabled} />
       </div>
     </div>
   );

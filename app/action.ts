@@ -4,8 +4,10 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "./utlis/db";
 import { getServerSession } from "next-auth";
 import { authOptions } from "./utlis/auth";
+import { hasAuth } from "./utlis/runtime";
 
 export async function addToWatchList(formData: FormData): Promise<void> {
+  if (!hasAuth) return;
   const movieId = formData.get("movieId");
   const pathname = formData.get("pathname");
 
@@ -44,6 +46,7 @@ export async function addToWatchList(formData: FormData): Promise<void> {
 }
 
 export async function removeFromWatchList(formData: FormData): Promise<void> {
+  if (!hasAuth) return;
   const watchListId = formData.get("watchListId") as string;
   const pathname = formData.get("pathname") as string;
 

@@ -1,7 +1,10 @@
 import { prisma } from "../utlis/db";
 import MovieButtons from "./MovieButtons";
+import { catalog } from "../utlis/catalog";
+import { hasDatabase } from "../utlis/runtime";
 
 async function getData() {
+  if (!hasDatabase) return catalog[0];
   const data = await prisma.movie.findFirst({
     select: {
       title: true,

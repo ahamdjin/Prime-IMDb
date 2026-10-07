@@ -1,8 +1,15 @@
 import MovieCard from "@/app/components/MovieCard";
 import { prisma } from "@/app/utlis/db";
 import Image from "next/image";
+import { catalog } from "@/app/utlis/catalog";
+import { hasAuth, hasDatabase } from "@/app/utlis/runtime";
 
 async function getData(category: string, userId: string) {
+  if (!hasDatabase) {
+    const categories: Record<string, string> = { tvshows: "show", movies: "movie", recently: "recent" };
+    if (!categories[category]) return [];
+    return catalog.filter((movie) => movie.category === categories[category]).map((movie) => ({ ...movie, WatchLists: [] as { userId: string }[] }));
+  }
   switch (category) {
     case "tvshows": {
       const data = await prisma.movie.findMany({
@@ -56,7 +63,7 @@ async function getData(category: string, userId: string) {
     case "recently": {
       const data = await prisma.movie.findMany({
         where: {
-          category: "recently",
+          category: "recent",
         },
         select: {
           age: true,
@@ -114,6 +121,7 @@ export default async function CategoryPage({
               className="w-full h-full rounded-lg object-cover"
             />
             <MovieCard
+              watchlistEnabled={hasAuth}
               key={movie.id}
               age={movie.age}
               time={movie.duration}
@@ -123,7 +131,7 @@ export default async function CategoryPage({
               youtubeUrl={movie.youtubeString}
               watchLists={movie.WatchLists.length > 0 ? true : false}
               year={movie.release}
-              movieId={0}
+              movieId={movie.id}
             />
           </div>
         </div>

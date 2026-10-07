@@ -3,6 +3,8 @@ import { authOptions } from "@/app/utlis/auth";
 import { prisma } from "@/app/utlis/db";
 import { getServerSession } from "next-auth";
 import Image from "next/image";
+import Link from "next/link";
+import { hasAuth } from "@/app/utlis/runtime";
 
 async function getData(email: string) {
   // First, get the user ID from the email
@@ -45,6 +47,9 @@ async function getData(email: string) {
 }
 
 export default async function Watchlist() {
+  if (!hasAuth) {
+    return <div className="mt-10 px-5 text-center text-white">Your list will be available when accounts are enabled. <Link href="/home" className="underline">Browse movies</Link></div>;
+  }
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.email) {

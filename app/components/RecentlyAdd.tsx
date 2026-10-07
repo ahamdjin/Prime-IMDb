@@ -2,6 +2,8 @@
 import Image from "next/image";
 import { prisma } from "../utlis/db";
 import MovieCard from "./MovieCard";
+import { catalog } from "../utlis/catalog";
+import { hasAuth, hasDatabase } from "../utlis/runtime";
 
 // Define the Movie type based on the actual Prisma return type
 type Movie = {
@@ -21,6 +23,9 @@ type Movie = {
 };
 
 async function getData(): Promise<Movie[]> {
+  if (!hasDatabase) {
+    return catalog.filter((movie) => movie.category === "recent").slice(0, 4).map((movie) => ({ ...movie, WatchLists: [] }));
+  }
   const data = await prisma.movie.findMany({
     select: {
       id: true,
@@ -72,6 +77,7 @@ const RecentlyAdd = async () => {
               />
 
               <MovieCard
+                watchlistEnabled={hasAuth}
                 movieId={movie.id} // Now properly typed as number
                 overview={movie.overview}
                 title={movie.title}

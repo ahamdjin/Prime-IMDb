@@ -2,6 +2,10 @@
 
 Imported from the supplied StreamFlix ZIP.
 
+## Guest mode
+
+Visitors can browse the included movie catalog and watch trailers without an account or database. The Sign in page remains visible and explains that accounts are unavailable until a PostgreSQL database and an email, GitHub, or Google sign-in provider are configured. Watchlists require an account.
+
 ## Overview
 
 StreamFlix is a modern Netflix clone built with Next.js, featuring a sleek UI, robust authentication, and seamless video streaming capabilities. This project demonstrates best practices in frontend development with React, TypeScript, and Tailwind CSS.
