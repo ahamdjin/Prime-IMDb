@@ -1,0 +1,69 @@
+import { randomBytes } from "crypto";
+import { NextResponse } from "next/server";
+import { createPlaybackToken } from "@/app/utlis/playback-session";
+
+export const runtime = "nodejs";
+
+type RequestBody = {
+  imdbId?: string;
+  mediaType?: "movie" | "tv";
+  season?: number;
+  episode?: number;
+  resumeAt?: number;
+};
+
+function sameOrigin(request: Request) {
+  const url = new URL(request.url);
+  const origin = request.headers.get("origin");
+  const fetchSite = request.headers.get("sec-fetch-site");
+  if (origin && origin !== url.origin) return false;
+  if (fetchSite && !["same-origin", "same-site", "none"].includes(fetchSite)) return false;
+  return true;
+}
+
+export async function POST(request: Request) {
+  if (!sameOrigin(request)) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
+  let body: RequestBody;
+  try {
+    body = await request.json() as RequestBody;
+  } catch {
+    return NextResponse.json({ error: "Invalid request" }, { status: 400 });
+  }
+
+  const imdbId = String(body.imdbId || "");
+  const mediaType = body.mediaType;
+  if (!/^tt\d+$/.test(imdbId) || (mediaType !== "movie" && mediaType !== "tv")) {
+    return NextResponse.json({ error: "Invalid media" }, { status: 400 });
+  }
+
+  const season = Math.max(1, Math.min(999, Number(body.season) || 1));
+  const episode = Math.max(1, Math.min(9999, Number(body.episode) || 1));
+  const resumeAt = Math.max(0, Math.min(60 * 60 * 24, Math.floor(Number(body.resumeAt) || 0)));
+
+  try {
+    const token = createPlaybackToken({
+      imdbId,
+      mediaType,
+      season,
+      episode,
+      resumeAt,
+      exp: Date.now() + 60_000,
+      nonce: randomBytes(16).toString("hex"),
+    });
+
+    return NextResponse.json(
+      { playerPath: `/player/${encodeURIComponent(token)}` },
+      {
+        headers: {
+          "Cache-Control": "no-store, private",
+          "X-Robots-Tag": "noindex, nofollow, noarchive",
+        },
+      }
+    );
+  } catch {
+    return NextResponse.json({ error: "Playback security is not configured" }, { status: 503 });
+  }
+}
