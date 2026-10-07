@@ -54,6 +54,20 @@ const nextConfig: NextConfig = {
         source: "/(.*)",
         headers: securityHeaders,
       },
+      {
+        source: "/player/:path*",
+        headers: [
+          { key: "Cache-Control", value: "no-store, private, max-age=0" },
+          { key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" },
+        ],
+      },
+      {
+        source: "/api/playback/:path*",
+        headers: [
+          { key: "Cache-Control", value: "no-store, private, max-age=0" },
+          { key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" },
+        ],
+      },
     ];
   },
 };
