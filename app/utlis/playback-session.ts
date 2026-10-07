@@ -9,6 +9,7 @@ export type PlaybackSessionPayload = {
   resumeAt: number;
   exp: number;
   nonce: string;
+  clientHash: string;
 };
 
 function getSecret() {
@@ -57,10 +58,18 @@ export function verifyPlaybackToken(token: string): PlaybackSessionPayload | nul
       Date.now() > payload.exp ||
       !Number.isFinite(payload.season) ||
       !Number.isFinite(payload.episode) ||
-      !Number.isFinite(payload.resumeAt)
+      !Number.isFinite(payload.resumeAt) ||
+      !/^[a-f0-9]{64}$/.test(payload.clientHash)
     ) return null;
     return payload;
   } catch {
     return null;
   }
+}
+
+
+export function getPlaybackClientHash(userAgent: string, ip: string) {
+  const secret = getSecret();
+  if (!secret) throw new Error("Playback session secret is not configured");
+  return createHmac("sha256", secret).update(`${userAgent}|${ip}`).digest("hex");
 }
