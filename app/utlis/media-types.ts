@@ -3,6 +3,7 @@ export type MediaType = "movie" | "tv";
 export type MediaItem = {
   key: string;
   tmdbId?: number;
+  imdbId?: string;
   mediaType: MediaType;
   title: string;
   overview: string;

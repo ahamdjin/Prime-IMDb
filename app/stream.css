@@ -130,3 +130,67 @@ body { background: #08090b; color: #f5f5f6; }
 .stream-credit { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 14px; padding: 25px 20px 85px; background: #08090b; color: #777; font-size: .72rem; text-align: center; }
 .stream-credit img { display: block; }
 @media (max-width: 620px) { .stream-filter-bar label { flex: 1 1 calc(50% - 12px); min-width: 0; } .stream-filter-bar button { flex: 1; } .stream-demo-note { margin-left: 20px; margin-right: 20px; } }
+
+
+/* Watch page trailer action */
+.stream-watch-actions {
+  display: flex;
+  gap: 12px;
+  margin: 18px 0 8px;
+}
+
+.stream-trailer-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid rgba(255,255,255,.18);
+  background: rgba(255,255,255,.08);
+  color: #fff;
+  padding: 10px 14px;
+  border-radius: 999px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.stream-trailer-button:hover {
+  background: rgba(255,255,255,.14);
+}
+
+.stream-trailer-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  background: rgba(0,0,0,.88);
+  padding: 24px;
+}
+
+.stream-trailer-video {
+  width: min(1100px, 94vw);
+  aspect-ratio: 16 / 9;
+  background: #000;
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.stream-trailer-video iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.stream-trailer-close {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255,255,255,.12);
+  color: #fff;
+  cursor: pointer;
+}
