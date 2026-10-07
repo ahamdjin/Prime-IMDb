@@ -16,4 +16,4 @@ export type MediaItem = {
 };
 
 export type Genre = { id: number; name: string; type: MediaType };
-export type MediaPage = { items: MediaItem[]; page: number; totalPages: number; source: "tmdb" | "demo" };
+export type MediaPage = { items: MediaItem[]; page: number; totalPages: number; source: "tmdb" | "vidapi" | "demo" };
