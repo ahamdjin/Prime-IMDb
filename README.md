@@ -1,122 +1,29 @@
 # Prime IMDb
 
-Imported from the supplied StreamFlix ZIP.
+A Netflix-style movie and TV discovery site built with Next.js. Visitors can browse without signing in, search titles, filter by type, genre, year, and sort order, open a title's YouTube trailer when TMDB has one, and save titles to My List in their browser.
 
-## Guest mode
+## TMDB setup
 
-Visitors can browse the included movie catalog, search titles, open YouTube trailers in a new tab, and save a local My List without an account or database. My List is stored in that browser on that device. The Sign in page remains visible and explains that accounts are unavailable until a PostgreSQL database and an email, GitHub, or Google sign-in provider are configured.
+Add one of these environment variables on the server (Vercel Project Settings → Environment Variables → Production), then redeploy:
 
-## Overview
+- `TMDB_API_READ_TOKEN`: TMDB **API Read Access Token** (recommended)
+- `TMDB_API_KEY`: TMDB v3 API key
 
-StreamFlix is a modern Netflix clone built with Next.js, featuring a sleek UI, robust authentication, and seamless video streaming capabilities. This project demonstrates best practices in frontend development with React, TypeScript, and Tailwind CSS.
+Do not use a `NEXT_PUBLIC_` prefix or put the key in client code. The app requests TMDB data from the Next.js server and builds image URLs from the returned poster/backdrop paths. If no credential is set or TMDB is unavailable, it displays the bundled 11-title preview catalog.
 
-## Features
+The home page uses TMDB trending, popular, top-rated, and now-playing lists. Browse uses TMDB Discover with type, genre, year, and sort filters. Search uses TMDB multi-search. Results are paginated so visitors can browse beyond the first page. The title page embeds an available YouTube trailer; TMDB data does not provide full movie or episode playback.
 
-- **User Authentication**: Secure login/signup with NextAuth
-- **Responsive Design**: Looks great on desktop, tablet, and mobile devices
-- **Modern UI**: Sleek, Netflix-inspired interface with fluid animations
-- **Video Streaming**: Stream trailers and video content
-- **Content Browsing**: Browse movies and shows by category
-- **User Profiles**: Support for multiple user profiles
-- **Search Functionality**: Find content quickly with the search feature
-- **Watchlist Management**: Add/remove content to personal watchlists
-
-## Tech Stack
-
-- **Frontend**: Next.js, React, TypeScript
-- **Styling**: Tailwind CSS, shadcn/ui components
-- **Authentication**: NextAuth.js
-- **Icons**: Lucide React
-- **Fonts**: Geist & Geist Mono
-
-## Getting Started
-
-### Prerequisites
-
-- Node.js 18+ and npm/yarn
-- Git
-
-### Installation
-
-1. Clone the repository:
-
-   ```bash
-   git clone https://github.com/ahamdjin/Prime-IMDb.git
-   cd Prime-IMDb
-   ```
-
-2. Install dependencies:
-
-   ```bash
-   npm install
-   # or
-   yarn install
-   ```
-
-3. Configure environment variables:
-
-   ```
-   # Create a .env.local file with the following:
-   NEXTAUTH_URL=http://localhost:3000
-   NEXTAUTH_SECRET=your_secret_key
-
-   # Add your API keys for movie data (if applicable)
-   TMDB_API_KEY=your_tmdb_api_key
-   ```
-
-4. Run the development server:
-
-   ```bash
-   npm run dev
-   # or
-   yarn dev
-   ```
-
-5. Open [http://localhost:3000](http://localhost:3000) in your browser to see the application.
-
-## Project Structure
-
-```
-├── app/
-│   ├── components/        # Reusable UI components
-│   ├── api/               # API routes
-│   └── pages/             # Page components
-├── public/                # Static assets
-├── styles/                # Global styles
-├── lib/                   # Utility functions
-└── types/                 # TypeScript types
-```
-
-## Deployment
-
-### Vercel (Recommended)
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme).
+## Run locally
 
 ```bash
-npm install -g vercel
-vercel
+pnpm install
+pnpm dev
 ```
 
-### Other Platforms
+Open `http://localhost:3000`. To use the full catalog locally, add `TMDB_API_READ_TOKEN` or `TMDB_API_KEY` to `.env.local`.
 
-This application can also be deployed on any platform that supports Next.js applications, such as Netlify, AWS Amplify, or traditional hosting with a proper Node.js environment.
+Accounts remain optional. Without a database and sign-in provider, the Sign in page explains that login is unavailable. My List remains local to each browser.
 
-## Contributing
+## Attribution
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Acknowledgments
-
-- Inspired by Netflix's UI/UX
-- Built with the amazing Next.js framework
-- UI components powered by shadcn/ui
-- Icons from Lucide React
+This product uses the TMDB API but is not endorsed or certified by TMDB. TMDB data and images are subject to [TMDB's terms](https://www.themoviedb.org/api-terms-of-use). The site displays TMDB's approved logo and attribution in its footer.

@@ -1,17 +1,15 @@
 import HeroShowcase from "../components/HeroShowcase";
 import TitleRail from "../components/TitleRail";
-import { catalog } from "../utlis/catalog";
+import { getHomeData } from "../utlis/tmdb";
 
-export default function HomePage() {
-  const featured = [catalog[0], catalog[7], catalog[3], catalog[4], catalog[5]];
+export default async function HomePage() {
+  const data = await getHomeData();
   return (
     <div className="stream-page">
-      <HeroShowcase movies={featured} />
+      <HeroShowcase movies={data.featured} />
       <div className="stream-rows">
-        <TitleRail title="Top 10 Today" movies={catalog.slice(0, 10)} ranked />
-        <TitleRail title="Trending Now" movies={[...catalog].reverse()} />
-        <TitleRail title="Movies" movies={catalog.filter((movie) => movie.category === "movie" || movie.category === "recent")} />
-        <TitleRail title="Series" movies={catalog.filter((movie) => movie.category === "show")} />
+        {data.source === "demo" && <p className="stream-demo-note">Preview catalog · Add a TMDB credential in Vercel to load the full catalog.</p>}
+        {data.rows.map((row) => <TitleRail key={row.title} title={row.title} movies={row.items} ranked={"ranked" in row && row.ranked} />)}
       </div>
     </div>
   );
