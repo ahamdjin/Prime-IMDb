@@ -35,7 +35,7 @@ export default function Navbar({ authEnabled }: { authEnabled: boolean }) {
   useEffect(() => { if (searchOpen) inputRef.current?.focus(); }, [searchOpen]);
   useEffect(() => {
     const value = query.trim();
-    if (!value) { setMatches([]); return; }
+    if (value.length < 2) { setMatches([]); return; }
     const controller = new AbortController();
     const timer = setTimeout(async () => {
       try {
