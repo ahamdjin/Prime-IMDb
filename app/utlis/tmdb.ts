@@ -1,6 +1,6 @@
 import { catalog } from "./catalog";
 import type { Genre, MediaItem, MediaPage, MediaType } from "./media-types";
-import { filterToVidApiAvailable, getVidApiLatest } from "./vidapi";
+import { filterToVidApiAvailable, filterWithVidApiAvailability, getVidApiAvailability, getVidApiLatest } from "./vidapi";
 
 const BASE = "https://api.themoviedb.org/3";
 export const tmdbConfigured = Boolean(process.env.TMDB_API_READ_TOKEN || process.env.TMDB_API_KEY);
@@ -92,11 +92,12 @@ export async function getHomeData() {
     ];
     const lists = await Promise.all(paths.map(([path]) => request<TmdbList>(path)));
     const rawItems = lists.map((list, index) => toItems(list.results, paths[index][1]));
-    const items = await Promise.all(rawItems.map((list) => filterToVidApiAvailable(list)));
-    const [latestMovies, latestShows] = await Promise.all([
+    const [availability, latestMovies, latestShows] = await Promise.all([
+      getVidApiAvailability(),
       getVidApiLatest("movie", 1),
       getVidApiLatest("tv", 1),
     ]);
+    const items = rawItems.map((list) => filterWithVidApiAvailability(list, availability));
     const featured = items[0].filter((item) => item.backdrop).slice(0, 6);
     return { source: "vidapi" as const, featured: featured.length ? featured : latestMovies.items.slice(0, 6), rows: [
       { title: "Latest Movies", items: latestMovies.items },
