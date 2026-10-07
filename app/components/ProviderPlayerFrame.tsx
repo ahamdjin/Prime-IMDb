@@ -34,22 +34,12 @@ export default function ProviderPlayerFrame({ src }: { src: string }) {
       trip();
     };
 
-    const inspectViewport = () => {
-      if (window.innerWidth < 900) return;
-      const widthGap = Math.max(0, window.outerWidth - window.innerWidth);
-      const heightGap = Math.max(0, window.outerHeight - window.innerHeight);
-      if (widthGap > 180 || heightGap > 220) trip();
-    };
-
     window.addEventListener("keydown", onKeyDown, true);
     window.addEventListener("contextmenu", onContextMenu, true);
-    const timer = window.setInterval(inspectViewport, 1200);
-    inspectViewport();
 
     return () => {
       window.removeEventListener("keydown", onKeyDown, true);
       window.removeEventListener("contextmenu", onContextMenu, true);
-      window.clearInterval(timer);
     };
   }, []);
 
