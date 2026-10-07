@@ -30,7 +30,7 @@ export default async function BrowsePage({ searchParams }: { searchParams: Promi
         <button type="submit">Apply filters</button>
         <Link href="/browse" className="stream-filter-reset">Reset</Link>
       </form>
-      {data.source === "demo" && <p className="stream-demo-note">Preview catalog · Add a TMDB credential in Vercel to load more titles and live rankings.</p>}
+      {data.source === "demo" && <p className="stream-demo-note">Preview catalog · More titles coming soon.</p>}
       {data.items.length ? <div className="stream-grid">{data.items.map((item) => <CatalogCard key={item.key} movie={item} poster />)}</div> : <p className="stream-empty">No titles match these filters.</p>}
       {data.totalPages > 1 && <nav className="stream-pagination" aria-label="Browse pages">{page > 1 && <Link href={makePageUrl(page - 1)}>← Previous</Link>}<span>Page {page} of {data.totalPages}</span>{page < data.totalPages && <Link href={makePageUrl(page + 1)}>Next →</Link>}</nav>}
     </main></>

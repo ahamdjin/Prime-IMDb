@@ -8,7 +8,7 @@ export default async function HomePage() {
     <div className="stream-page">
       <HeroShowcase movies={data.featured} />
       <div className="stream-rows">
-        {data.source === "demo" && <p className="stream-demo-note">Preview catalog · Add a TMDB credential in Vercel to load the full catalog.</p>}
+        {data.source === "demo" && <p className="stream-demo-note">Preview catalog · More titles coming soon.</p>}
         {data.rows.map((row) => <TitleRail key={row.title} title={row.title} movies={row.items} ranked={"ranked" in row && row.ranked} />)}
       </div>
     </div>

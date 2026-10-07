@@ -108,7 +108,7 @@ export async function getHomeData() {
 function getDemoHomeData() {
   return { source: "demo" as const, featured: demoItems.slice(0, 5), rows: [
     { title: "Movies", items: demoItems.filter((item) => item.mediaType === "movie"), ranked: false },
-    { title: "Trending Now", items: [...demoItems].reverse() },
+    { title: "Preview Picks", items: [...demoItems].reverse() },
     { title: "Movies", items: demoItems.filter((item) => item.mediaType === "movie") },
     { title: "TV Shows", items: demoItems.filter((item) => item.mediaType === "tv") },
   ] };

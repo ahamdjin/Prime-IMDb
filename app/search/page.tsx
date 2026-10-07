@@ -13,7 +13,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
   return (
     <><Navbar authEnabled={hasAuth} /><main className="stream-catalog-page stream-search-page">
       <div className="stream-catalog-heading"><p className="stream-kicker">FIND SOMETHING TO WATCH</p><h1>{query ? `Results for “${query}”` : "Search"}</h1><p>{query ? `${data.items.length} title${data.items.length === 1 ? "" : "s"} on this page` : "Use the search button above to find a movie or show."}</p></div>
-      {data.source === "demo" && query && <p className="stream-demo-note">Searching the preview catalog. Add a TMDB credential for the full catalog.</p>}
+      {data.source === "demo" && query && <p className="stream-demo-note">Searching the preview catalog.</p>}
       {data.items.length ? <div className="stream-grid">{data.items.map((movie) => <CatalogCard key={movie.key} movie={movie} poster />)}</div> : query && <p className="stream-empty">No titles found. Try another search.</p>}
       {data.totalPages > 1 && <nav className="stream-pagination" aria-label="Search pages">{page > 1 && <Link href={pageUrl(page - 1)}>← Previous</Link>}<span>Page {page} of {data.totalPages}</span>{page < data.totalPages && <Link href={pageUrl(page + 1)}>Next →</Link>}</nav>}
     </main></>
