@@ -31,6 +31,8 @@ export default async function WatchPage({ params, searchParams }: Props) {
     mediaType: title.mediaType,
     season,
     episode,
+    title: title.title,
+    poster: title.backdrop || title.poster,
   });
 
   return (
@@ -42,7 +44,7 @@ export default async function WatchPage({ params, searchParams }: Props) {
 
       <div className="stream-player-shell">
         <div className="stream-player-frame">
-          <EmbeddedPlayer src={videoEmbed} title={title.title} poster={title.backdrop || title.poster} />
+          <EmbeddedPlayer src={videoEmbed} title={title.title} poster={title.backdrop || title.poster} mediaKey={title.imdbId || title.key} />
         </div>
 
         <div className="stream-watch-details">
