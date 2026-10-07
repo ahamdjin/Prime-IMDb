@@ -2,7 +2,6 @@ import { ArrowLeft, Play } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getMediaItem } from "@/app/utlis/tmdb";
-import { buildVideoEmbedUrl } from "@/app/utlis/player";
 import TrailerButton from "@/app/components/TrailerButton";
 import EmbeddedPlayer from "@/app/components/EmbeddedPlayer";
 import type { Metadata } from "next";
@@ -26,15 +25,6 @@ export default async function WatchPage({ params, searchParams }: Props) {
 
   const season = Math.max(1, Number(query.season) || 1);
   const episode = Math.max(1, Number(query.episode) || 1);
-  const videoEmbed = buildVideoEmbedUrl({
-    imdbId: title.imdbId,
-    mediaType: title.mediaType,
-    season,
-    episode,
-    title: title.title,
-    poster: title.backdrop || title.poster,
-  });
-
   return (
     <main className="stream-watch-page">
       <div className="stream-watch-top">
@@ -44,12 +34,20 @@ export default async function WatchPage({ params, searchParams }: Props) {
 
       <div className="stream-player-shell">
         <div className="stream-player-frame">
-          <EmbeddedPlayer src={videoEmbed} title={title.title} poster={title.backdrop || title.poster} mediaKey={title.imdbId || title.key} />
+          <EmbeddedPlayer
+            imdbId={title.imdbId}
+            mediaType={title.mediaType}
+            season={season}
+            episode={episode}
+            title={title.title}
+            poster={title.backdrop || title.poster}
+            mediaKey={title.imdbId || title.key}
+          />
         </div>
 
         <div className="stream-watch-details">
           <div>
-            <p className="stream-kicker"><Play size={13} fill="currentColor" /> {videoEmbed ? "NOW PLAYING" : "TITLE DETAILS"}</p>
+            <p className="stream-kicker"><Play size={13} fill="currentColor" /> {title.imdbId ? "READY TO PLAY" : "TITLE DETAILS"}</p>
             <h1>{title.title}</h1>
             <p className="stream-watch-meta">
               {title.year || "Year unavailable"} <span>·</span> {title.mediaType === "tv" ? `Series · S${season} E${episode}` : "Movie"}
@@ -61,17 +59,6 @@ export default async function WatchPage({ params, searchParams }: Props) {
             </div>
 
             <p className="stream-watch-overview">{title.overview}</p>
-
-            {title.tmdbId && (
-              <a
-                className="stream-tmdb-title-link"
-                href={`https://www.themoviedb.org/${title.mediaType}/${title.tmdbId}`}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                View on TMDB ↗
-              </a>
-            )}
           </div>
 
           <div className="stream-watch-next">
