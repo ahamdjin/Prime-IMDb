@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { getMediaItem } from "@/app/utlis/tmdb";
 import { buildVideoEmbedUrl } from "@/app/utlis/player";
 import TrailerButton from "@/app/components/TrailerButton";
+import EmbeddedPlayer from "@/app/components/EmbeddedPlayer";
 import type { Metadata } from "next";
 
 type Props = {
@@ -41,22 +42,7 @@ export default async function WatchPage({ params, searchParams }: Props) {
 
       <div className="stream-player-shell">
         <div className="stream-player-frame">
-          {videoEmbed ? (
-            <iframe
-              src={videoEmbed}
-              title={`${title.title} player`}
-              allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
-              referrerPolicy="strict-origin-when-cross-origin"
-              allowFullScreen
-            />
-          ) : (
-            <div
-              className="stream-trailer-empty"
-              style={{ backgroundImage: `linear-gradient(0deg, #08090b, rgba(0,0,0,.3)), url(${title.backdrop})` }}
-            >
-              <p>Full video player is unavailable for this title.</p>
-            </div>
-          )}
+          <EmbeddedPlayer src={videoEmbed} title={title.title} poster={title.backdrop || title.poster} />
         </div>
 
         <div className="stream-watch-details">
