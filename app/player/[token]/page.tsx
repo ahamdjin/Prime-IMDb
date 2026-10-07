@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import ProviderPlayerFrame from "@/app/components/ProviderPlayerFrame";
-import { verifyPlaybackToken } from "@/app/utlis/playback-session";
+import { getPlaybackClientHash, verifyPlaybackToken } from "@/app/utlis/playback-session";
+import { headers } from "next/headers";
 import { buildVideoEmbedUrl } from "@/app/utlis/player";
 
 export const dynamic = "force-dynamic";
@@ -18,6 +19,11 @@ export default async function SecurePlayerPage({
   const { token } = await params;
   const payload = verifyPlaybackToken(decodeURIComponent(token));
   if (!payload) notFound();
+
+  const requestHeaders = await headers();
+  const userAgent = requestHeaders.get("user-agent") || "";
+  const ip = (requestHeaders.get("x-forwarded-for") || requestHeaders.get("x-real-ip") || "unknown").split(",")[0].trim();
+  if (getPlaybackClientHash(userAgent, ip) !== payload.clientHash) notFound();
 
   const src = buildVideoEmbedUrl({
     imdbId: payload.imdbId,
