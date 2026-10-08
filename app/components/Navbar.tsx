@@ -6,6 +6,7 @@ import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import type { MediaItem } from "../utlis/media-types";
+import WatchLink from "./WatchLink";
 
 type NavItem = { label: string; href: string };
 const navItems: NavItem[] = [
@@ -69,10 +70,10 @@ export default function Navbar({ authEnabled }: { authEnabled: boolean }) {
                 <input ref={inputRef} value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Titles, movies, shows" aria-label="Search movies and shows" />
                 <button type="button" onClick={() => { setSearchOpen(false); setQuery(""); }} aria-label="Close search"><X size={18} /></button>
                 {query.trim() && <div className="stream-search-suggestions">
-                  {matches.length ? matches.map((movie) => <Link key={movie.key} href={`/watch/${movie.key}`} target="_blank" rel="noopener noreferrer" onClick={() => setSearchOpen(false)}>
+                  {matches.length ? matches.map((movie) => <WatchLink key={movie.key} href={`/watch/${movie.key}`} onBeforeNavigate={() => setSearchOpen(false)}>
                     <Image src={movie.poster} alt="" width={54} height={42} />
                     <span>{movie.title}<small>{movie.year || "—"} · {movie.mediaType === "tv" ? "Series" : "Movie"}</small></span>
-                  </Link>) : <p>No matching titles yet. Press Enter for results.</p>}
+                  </WatchLink>) : <p>No matching titles yet. Press Enter for results.</p>}
                   <button type="submit" className="stream-see-results">See all results for “{query.trim()}”</button>
                 </div>}
               </form>

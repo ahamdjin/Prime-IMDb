@@ -1,24 +1,31 @@
 import { ArrowLeft, Play } from "lucide-react";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { getMediaItem } from "@/app/utlis/tmdb";
 import TrailerButton from "@/app/components/TrailerButton";
 import EmbeddedPlayer from "@/app/components/EmbeddedPlayer";
 import { buildVideoEmbedUrl, episodeNumber } from "@/app/utlis/player";
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
+import { anonymousAccessCookie, verifyAnonymousAccessToken } from "@/app/utlis/access-session";
 
 type Props = {
   params: Promise<{ id: string }>;
   searchParams: Promise<{ season?: string; episode?: string }>;
 };
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { id } = await params;
-  const title = await getMediaItem(id);
-  return { title: title ? `${title.title} | Prime IMDb` : "Title not found | Prime IMDb" };
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: "Watch | Prime IMDb",
+    robots: { index: false, follow: false, nocache: true },
+  };
 }
 
 export default async function WatchPage({ params, searchParams }: Props) {
+  const cookieStore = await cookies();
+  const accessToken = cookieStore.get(anonymousAccessCookie.name)?.value;
+  if (!verifyAnonymousAccessToken(accessToken)) redirect("/home");
+
   const { id } = await params;
   const query = await searchParams;
   const title = await getMediaItem(id);
