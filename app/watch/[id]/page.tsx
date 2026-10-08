@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { getMediaItem } from "@/app/utlis/tmdb";
 import TrailerButton from "@/app/components/TrailerButton";
 import EmbeddedPlayer from "@/app/components/EmbeddedPlayer";
+import { buildVideoEmbedUrl, episodeNumber } from "@/app/utlis/player";
 import type { Metadata } from "next";
 
 type Props = {
@@ -23,8 +24,8 @@ export default async function WatchPage({ params, searchParams }: Props) {
   const title = await getMediaItem(id);
   if (!title) notFound();
 
-  const season = Math.max(1, Number(query.season) || 1);
-  const episode = Math.max(1, Number(query.episode) || 1);
+  const season = episodeNumber(query.season, 999);
+  const episode = episodeNumber(query.episode);
   return (
     <main className="stream-watch-page">
       <div className="stream-watch-top">
@@ -35,13 +36,11 @@ export default async function WatchPage({ params, searchParams }: Props) {
       <div className="stream-player-shell">
         <div className="stream-player-frame">
           <EmbeddedPlayer
-            imdbId={title.imdbId}
-            mediaType={title.mediaType}
-            season={season}
-            episode={episode}
+            key={`${title.key}-${season}-${episode}`}
+            playerUrl={buildVideoEmbedUrl({ imdbId: title.imdbId, mediaType: title.mediaType, season, episode, autoplay: true }) || undefined}
             title={title.title}
             poster={title.backdrop || title.poster}
-            mediaKey={title.imdbId || title.key}
+            mediaKey={`${title.imdbId || title.key}${title.mediaType === "tv" ? `-${season}-${episode}` : ""}`}
           />
         </div>
 

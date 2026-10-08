@@ -11,7 +11,13 @@ Add one of these environment variables on the server (Vercel Project Settings â†
 
 Do not use a `NEXT_PUBLIC_` prefix or put the key in client code. The app requests TMDB data from the Next.js server and builds image URLs from the returned poster/backdrop paths. If no credential is set or TMDB is unavailable, it displays the bundled 11-title preview catalog.
 
-The home page uses TMDB trending, popular, top-rated, and now-playing lists. Browse uses TMDB Discover with type, genre, year, and sort filters. Search uses TMDB multi-search. Results are paginated so visitors can browse beyond the first page. The title page embeds an available YouTube trailer; TMDB data does not provide full movie or episode playback.
+The home page uses TMDB trending, popular, top-rated, and now-playing lists. Browse uses TMDB Discover with type, genre, year, and sort filters. Search uses TMDB multi-search. Results are paginated so visitors can browse beyond the first page. TMDB supplies metadata and trailers; full playback comes from the configured external embed provider.
+
+## Playback
+
+The watch page loads a single provider iframe when the visitor presses Play. It does not require login or a playback session secret. The iframe uses the documented embed format without sandbox restrictions and sends only the site's origin as its referrer. Window size, right-clicking, and unavailable local storage do not block playback.
+
+`VIDEO_EMBED_BASE_URL` optionally sets the provider base URL; the default is `https://vaplayer.ru`. Changing it requires a rebuild to update the allowed iframe origin. Movie URLs use `/embed/movie/{imdbId}`; TV URLs use `/embed/tv/{imdbId}/{season}/{episode}`. The legacy signed session routes are no longer used by the watch page.
 
 ## Run locally
 
@@ -26,4 +32,4 @@ Accounts remain optional. Without a database and sign-in provider, the Sign in p
 
 ## Attribution
 
-This product uses the TMDB API but is not endorsed or certified by TMDB. TMDB data and images are subject to [TMDB's terms](https://www.themoviedb.org/api-terms-of-use). The site displays TMDB's approved logo and attribution in its footer.
+This product uses the TMDB API but is not endorsed or certified by TMDB. TMDB data and images are subject to [TMDB's terms](https://www.themoviedb.org/api-terms-of-use). The site displays TMDB's approved logo and attribution on its Credits page.

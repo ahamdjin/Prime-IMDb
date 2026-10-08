@@ -1,13 +1,12 @@
 "use client";
 
-export default function ProviderPlayerFrame({ src }: { src: string }) {
+export default function ProviderPlayerFrame({ src, title = "Video player" }: { src: string; title?: string }) {
   return (
     <iframe
       src={src}
-      title="Secure video player"
-      sandbox="allow-scripts allow-same-origin allow-forms allow-presentation"
+      title={title}
       allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
-      referrerPolicy="no-referrer"
+      referrerPolicy="strict-origin"
       allowFullScreen
       style={{ width: "100%", height: "100%", border: 0 }}
     />

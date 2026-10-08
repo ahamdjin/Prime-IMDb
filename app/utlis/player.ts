@@ -2,6 +2,11 @@ import type { MediaType } from "./media-types";
 
 const EMBED_BASE = (process.env.VIDEO_EMBED_BASE_URL || "https://vaplayer.ru").replace(/\/$/, "");
 
+export function episodeNumber(value: unknown, maximum = 9999) {
+  const number = Number(value);
+  return Number.isFinite(number) ? Math.max(1, Math.min(maximum, Math.floor(number))) : 1;
+}
+
 export function buildVideoEmbedUrl({
   imdbId,
   mediaType,
@@ -25,7 +30,7 @@ export function buildVideoEmbedUrl({
 
   const base =
     mediaType === "tv"
-      ? `${EMBED_BASE}/embed/tv/${imdbId}/${Math.max(1, season)}/${Math.max(1, episode)}`
+      ? `${EMBED_BASE}/embed/tv/${imdbId}/${episodeNumber(season, 999)}/${episodeNumber(episode)}`
       : `${EMBED_BASE}/embed/movie/${imdbId}`;
 
   const url = new URL(base);
