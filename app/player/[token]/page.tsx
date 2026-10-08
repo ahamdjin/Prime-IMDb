@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import ProviderPlayerFrame from "@/app/components/ProviderPlayerFrame";
 import { getPlaybackClientHash, verifyPlaybackToken } from "@/app/utlis/playback-session";
-import { headers } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { buildVideoEmbedUrl } from "@/app/utlis/player";
+import { anonymousAccessCookie, verifyAnonymousAccessToken } from "@/app/utlis/access-session";
 
 export const dynamic = "force-dynamic";
 
@@ -16,6 +17,10 @@ export default async function SecurePlayerPage({
 }: {
   params: Promise<{ token: string }>;
 }) {
+  const cookieStore = await cookies();
+  const accessToken = cookieStore.get(anonymousAccessCookie.name)?.value;
+  if (!verifyAnonymousAccessToken(accessToken)) notFound();
+
   const { token } = await params;
   const payload = verifyPlaybackToken(decodeURIComponent(token));
   if (!payload) notFound();
