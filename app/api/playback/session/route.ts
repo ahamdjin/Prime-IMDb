@@ -1,6 +1,7 @@
 import { randomBytes } from "crypto";
 import { NextResponse } from "next/server";
 import { createPlaybackToken, getPlaybackClientHash } from "@/app/utlis/playback-session";
+import { anonymousAccessCookie, verifyAnonymousAccessToken } from "@/app/utlis/access-session";
 
 export const runtime = "nodejs";
 
@@ -33,7 +34,14 @@ function sameOrigin(request: Request) {
 }
 
 export async function POST(request: Request) {
-  if (!sameOrigin(request)) {
+  const cookieHeader = request.headers.get("cookie") || "";
+  const accessToken = cookieHeader
+    .split(";")
+    .map((part) => part.trim())
+    .find((part) => part.startsWith(`${anonymousAccessCookie.name}=`))
+    ?.slice(anonymousAccessCookie.name.length + 1);
+
+  if (!verifyAnonymousAccessToken(accessToken) || !sameOrigin(request)) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
