@@ -1,7 +1,6 @@
 "use client";
 
 import { ChevronLeft, ChevronRight, Info, Play } from "lucide-react";
-import Link from "next/link";
 import WatchLink from "./WatchLink";
 import { useState } from "react";
 import type { MediaItem } from "../utlis/media-types";
