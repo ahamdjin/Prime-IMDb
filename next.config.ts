@@ -16,12 +16,12 @@ const contentSecurityPolicy = [
   "object-src 'none'",
   "frame-ancestors 'self'",
   "form-action 'self'",
-  "script-src 'self' 'unsafe-inline'",
+  "script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com",
   "style-src 'self' 'unsafe-inline'",
   "font-src 'self' data:",
-  "img-src 'self' data: blob: https://image.tmdb.org",
-  "connect-src 'self' https://api.themoviedb.org https://vidapi.ru",
-  `frame-src 'self' ${embedOrigin} https://www.youtube.com https://www.youtube-nocookie.com`,
+  "img-src 'self' data: blob: https://image.tmdb.org https://challenges.cloudflare.com",
+  "connect-src 'self' https://api.themoviedb.org https://vidapi.ru https://challenges.cloudflare.com",
+  `frame-src 'self' ${embedOrigin} https://www.youtube.com https://www.youtube-nocookie.com https://challenges.cloudflare.com`,
   "media-src 'self' blob: https:",
   "upgrade-insecure-requests",
 ].join("; ");
@@ -70,6 +70,13 @@ const nextConfig: NextConfig = {
       },
       {
         source: "/api/playback/:path*",
+        headers: [
+          { key: "Cache-Control", value: "no-store, private, max-age=0" },
+          { key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" },
+        ],
+      },
+      {
+        source: "/verify",
         headers: [
           { key: "Cache-Control", value: "no-store, private, max-age=0" },
           { key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" },
