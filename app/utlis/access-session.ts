@@ -22,7 +22,7 @@ export function createAnonymousAccessToken() {
 }
 
 export function verifyAnonymousAccessToken(token?: string | null) {
-  if (!token) return false;
+  if (!token || !secret()) return false;
   const [payload, signature] = token.split(".");
   if (!payload || !signature) return false;
 
