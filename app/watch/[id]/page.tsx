@@ -22,12 +22,17 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function WatchPage({ params, searchParams }: Props) {
-  const cookieStore = await cookies();
-  const accessToken = cookieStore.get(anonymousAccessCookie.name)?.value;
-  if (!verifyAnonymousAccessToken(accessToken)) redirect("/home");
-
   const { id } = await params;
   const query = await searchParams;
+  const cookieStore = await cookies();
+  const accessToken = cookieStore.get(anonymousAccessCookie.name)?.value;
+  if (!verifyAnonymousAccessToken(accessToken)) {
+    const requested = new URLSearchParams();
+    if (query.season && /^\d{1,4}$/.test(query.season)) requested.set("season", query.season);
+    if (query.episode && /^\d{1,4}$/.test(query.episode)) requested.set("episode", query.episode);
+    const target = `/watch/${encodeURIComponent(id)}${requested.size ? `?${requested}` : ""}`;
+    redirect(`/verify?next=${encodeURIComponent(target)}`);
+  }
   const title = await getMediaItem(id);
   if (!title) notFound();
 

@@ -1,6 +1,6 @@
-import { createHmac, timingSafeEqual } from "crypto";
+import { createHmac, randomUUID, timingSafeEqual } from "crypto";
 
-const COOKIE_NAME = "prime_watch_access";
+const COOKIE_NAME = "prime_watch_verified";
 const TTL_MS = 2 * 60 * 60 * 1000;
 
 function secret() {
@@ -16,7 +16,7 @@ function sign(value: string) {
 export function createAnonymousAccessToken() {
   const payload = Buffer.from(JSON.stringify({
     exp: Date.now() + TTL_MS,
-    nonce: crypto.randomUUID(),
+    nonce: randomUUID(),
   })).toString("base64url");
   return `${payload}.${sign(payload)}`;
 }
