@@ -28,8 +28,8 @@ export default async function WatchPage({ params, searchParams }: Props) {
   const accessToken = cookieStore.get(anonymousAccessCookie.name)?.value;
   if (!verifyAnonymousAccessToken(accessToken)) {
     const requested = new URLSearchParams();
-    if (query.season && /^\\d{1,4}$/.test(query.season)) requested.set("season", query.season);
-    if (query.episode && /^\\d{1,4}$/.test(query.episode)) requested.set("episode", query.episode);
+    if (query.season && /^\d{1,4}$/.test(query.season)) requested.set("season", query.season);
+    if (query.episode && /^\d{1,4}$/.test(query.episode)) requested.set("episode", query.episode);
     const target = `/watch/${encodeURIComponent(id)}${requested.size ? `?${requested}` : ""}`;
     redirect(`/verify?next=${encodeURIComponent(target)}`);
   }
