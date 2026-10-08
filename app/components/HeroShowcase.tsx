@@ -2,6 +2,7 @@
 
 import { ChevronLeft, ChevronRight, Info, Play } from "lucide-react";
 import Link from "next/link";
+import WatchLink from "./WatchLink";
 import { useState } from "react";
 import type { MediaItem } from "../utlis/media-types";
 
@@ -22,8 +23,8 @@ export default function HeroShowcase({ movies }: { movies: MediaItem[] }) {
         <p className="stream-hero-meta"><span>{movie.year || "New"}</span><span>{movie.mediaType === "tv" ? "Series" : "Movie"}</span>{movie.rating > 0 && <span>★ {movie.rating.toFixed(1)}</span>}<span>HD</span></p>
         <p className="stream-hero-description">{movie.overview}</p>
         <div className="stream-hero-actions">
-          <Link href={`/watch/${movie.key}`} target="_blank" rel="noopener noreferrer" className="stream-play-button"><Play size={21} fill="currentColor" /> View title</Link>
-          <Link href={`/watch/${movie.key}`} className="stream-info-button"><Info size={21} /> More Info</Link>
+          <WatchLink href={`/watch/${movie.key}`} className="stream-play-button"><Play size={21} fill="currentColor" /> View title</WatchLink>
+          <WatchLink href={`/watch/${movie.key}`} className="stream-info-button"><Info size={21} /> More Info</WatchLink>
         </div>
       </div>
       <div className="stream-hero-dots">{movies.map((item, dot) => <button key={item.key} className={dot === index ? "active" : ""} onClick={() => choose(dot)} aria-label={`Feature ${item.title}`} />)}</div>
