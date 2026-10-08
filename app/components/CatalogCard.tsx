@@ -1,11 +1,11 @@
 "use client";
 
-import Link from "next/link";
 import Image from "next/image";
 import { Check, Play, Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { MediaItem } from "../utlis/media-types";
 import { readWatchlist, toggleWatchlist, WATCHLIST_EVENT } from "../utlis/watchlist";
+import WatchLink from "./WatchLink";
 
 export default function CatalogCard({ movie, rank, poster = false }: { movie: MediaItem; rank?: number; poster?: boolean }) {
   const [saved, setSaved] = useState(false);
@@ -18,13 +18,13 @@ export default function CatalogCard({ movie, rank, poster = false }: { movie: Me
   }, [movie.key]);
   return (
     <div className="stream-card">
-      <Link className="stream-card-main" href={`/watch/${movie.key}`} target="_blank" rel="noopener noreferrer" aria-label={`Open ${movie.title} in a new tab`}>
+      <WatchLink className="stream-card-main" href={`/watch/${movie.key}`} ariaLabel={`Open ${movie.title}`}>
         {rank && <span className="stream-rank">{rank}</span>}
         <Image src={(poster ? movie.poster : movie.backdrop) || movie.poster} alt={movie.title} width={poster ? 300 : 380} height={poster ? 450 : 215} className="stream-card-image" />
         <span className="stream-card-shade" />
         <span className="stream-card-play"><Play size={22} fill="currentColor" /></span>
         <span className="stream-card-info"><strong>{movie.title}</strong><small>{movie.year || "—"} · {movie.mediaType === "tv" ? "Series" : "Movie"}{movie.rating ? ` · ★ ${movie.rating.toFixed(1)}` : ""}</small></span>
-      </Link>
+      </WatchLink>
       <button className="stream-save" onClick={() => { toggleWatchlist(movie); setSaved(!saved); }} aria-label={`${saved ? "Remove" : "Add"} ${movie.title} ${saved ? "from" : "to"} My List`} title={saved ? "Remove from My List" : "Add to My List"}>{saved ? <Check size={18} /> : <Plus size={18} />}</button>
     </div>
   );
